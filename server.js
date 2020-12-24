@@ -4,6 +4,7 @@ var inquirer = require("inquirer");
 const { response } = require("express");
 const db = require("./db");
 const { viewRoles, viewEmployees } = require("./db");
+const { createPromptModule } = require("inquirer");
 
 // 2. Create the MySQL `connection` object.
 var connection = mysql.createConnection({
@@ -35,7 +36,12 @@ function actionPrompt() {
         name: "chooseAction",
         type:"list",
         message: "would you like view [add] a data element, [view] a data element, or [update] employee roles?",
-        choices: [ "VIEW_DEPARTMENTS", "VIEW_ROLES", "VIEW_EMPLOYEES", "QUIT" ]
+        choices: [ 
+            "VIEW_DEPARTMENTS", 
+            "VIEW_ROLES", 
+            "VIEW_EMPLOYEES", 
+            "CREATE_ROLE",
+            "QUIT" ]
     })
     .then(( res ) => {;
 
@@ -50,6 +56,10 @@ function actionPrompt() {
 
             case "VIEW_EMPLOYEES":
                 viewEmployees;
+                return;
+
+            case "CREATE_ROLE":
+                createRole();
                 return;
             
             default: 
@@ -70,6 +80,27 @@ function viewDepartments() {
         })
 }
 
+function createRole() {
+    db
+        .getDepartments()
+        .then(( department ) => {
+
+            console.log( department )
+
+            inquirer
+                .prompt([
+                    {
+                        message: "What department is this role in?",
+                        type: "list",
+                        choices: department.map( (department) =>({
+                            value:department.id,
+                            label: department.dept_name
+                        }))
+
+                    }
+                ])
+        })
+}
 
     inquirer.prompt([
         {
