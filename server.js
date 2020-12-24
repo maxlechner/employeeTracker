@@ -2,6 +2,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 const { response } = require("express");
+const db = require("./db");
+const { viewRoles, viewEmployees } = require("./db");
 
 // 2. Create the MySQL `connection` object.
 var connection = mysql.createConnection({
@@ -32,24 +34,43 @@ function actionPrompt() {
     inquirer.prompt({
         name: "chooseAction",
         type:"list",
-        message: "would you like to [add] a data element, [view] a data element, or [update] employee roles?",
-        choices: [ "add_Elements", "view_Elements", "update_Roles" ]
+        message: "would you like view [add] a data element, [view] a data element, or [update] employee roles?",
+        choices: [ "VIEW_DEPARTMENTS", "VIEW_ROLES", "VIEW_EMPLOYEES", "QUIT" ]
     })
-    .then( function( response ) {
-        if ( response.chooseAction === "add_Elements" ) {
-            addElements();
-        } else if ( response.chooseAction === "view_Elements" ) {
-            viewElements();
-        } else if ( response.chooseAction === "update_Roles" ) {
-            updateRoles();
-        } else {
-            connection.end();
+    .then(( res ) => {;
+
+        switch( res.action )  {
+            case "VIEW_DEPARTMENTS":
+                viewDepartments;
+                return;
+
+            case "VIEW_ROLES":
+                viewRoles;
+                return;
+
+            case "VIEW_EMPLOYEES":
+                viewEmployees;
+                return;
+            
+            default: 
+                connection.end()
+
         }
     });
 }
 
-function addElements() {
+function viewDepartments() {
 //  - IF "POST" THEN `prompt` the users for information about a new auction item and add it to the database (C - CREATE)
+    db
+        .getDepartments()
+
+        .then((results){
+            console.table( results );
+            actionPrompt;
+        })
+}
+
+
     inquirer.prompt([
         {
             name: "item",
