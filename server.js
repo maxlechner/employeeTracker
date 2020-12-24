@@ -28,25 +28,27 @@ connection.connect(function(err) {
     auctionPrompt();
 })
 
-function auctionPrompt() { 
+function actionPrompt() { 
     inquirer.prompt({
         name: "chooseAction",
         type:"list",
-        message: "would you like to [post] an item, or [bid] on an item?",
-        choices: [ "post", "bid", "exit" ]
+        message: "would you like to [add] a data element, [view] a data element, or [update] employee roles?",
+        choices: [ "add_Elements", "view_Elements", "update_Roles" ]
     })
     .then( function( response ) {
-        if ( response.chooseAction === "post" ) {
-            postAuction();
-        } else if ( response.chooseAction === "bid" ) {
-            bidAuction();
+        if ( response.chooseAction === "add_Elements" ) {
+            addElements();
+        } else if ( response.chooseAction === "view_Elements" ) {
+            viewElements();
+        } else if ( response.chooseAction === "update_Roles" ) {
+            updateRoles();
         } else {
             connection.end();
         }
     });
 }
 
-function postAuction() {
+function addElements() {
 //  - IF "POST" THEN `prompt` the users for information about a new auction item and add it to the database (C - CREATE)
     inquirer.prompt([
         {
@@ -78,7 +80,7 @@ function postAuction() {
             if (err) throw err;
             console.log(res.affectedRows + " item inserted!\n");
             // Call updateProduct AFTER the INSERT completes
-            auctionPrompt();
+            actionPrompt();
         }
     );
     console.log(query.sql);
@@ -88,7 +90,7 @@ function postAuction() {
     
 }
 
-function bidAuction() {
+function viewElements() {
 
 //      - `SELECT` all existing items from the database (R - READ)
     connection.query("SELECT * FROM auctions", function(err, res) {
@@ -138,7 +140,7 @@ function bidAuction() {
                 );
             } else { 
                 console.log( "bid is too low, try again" );
-                bidAuction();
+                actionPrompt();
             }
     
     });
@@ -148,3 +150,64 @@ function bidAuction() {
 
     });
 }
+
+function updateRoles() {
+
+    //      - `SELECT` all existing items from the database (R - READ)
+        connection.query("SELECT * FROM auctions", function(err, res) {
+            if (err) throw err;
+            // Log all results of the SELECT statement
+            // console.log(res[0].item_name);
+            
+            // define array and push value from items
+            var sqlResponse = [];
+    
+            for (let i = 0; i < res.length; i++ ) {
+                sqlResponse.push(res[i].item_name);
+            }
+            
+    
+        //      - THEN `prompt` the user for which one they want to bid on and how much they want to bid (You'll need to make a list of choices using the results from the SELECT)
+            inquirer.prompt([
+                {
+                    name: "item",
+                    type: "list",
+                    message: "What item would you like to bid on?",
+                    choices: sqlResponse
+                },
+                {
+                    name: "bid",
+                    type: "input",
+                    message: "how much would you like to bid?"
+                }
+            ]).then( function( response ) {
+                if ( parseInt( response.bid ) > parseInt( res[sqlResponse.indexOf( response.item )].highest_bid )) {
+                    var query = connection.query(
+                        "UPDATE auctions SET ? WHERE ?",
+                        [
+                            {
+                                highest_bid: response.bid,
+                            },
+                            {
+                                item_name: response.item,
+                            }
+                        ],
+                        function(err, res) {
+                            if (err) throw err;
+                            console.log(res.affectedRows + " item highest bid updated!\n");
+                            // Call updateProduct AFTER the INSERT completes
+                            auctionPrompt();
+                        }
+                    );
+                } else { 
+                    console.log( "bid is too low, try again" );
+                    actionPrompt();
+                }
+        
+        });
+    //      - THEN check if the provided bid is higher then the saved amount
+    //          - IF the bid is higher THEN `UPDATE` the item and `console.log` "Bid placed successfully!" (U - UPDATE)
+    //          - ELSE `console.log` "Your bid was too low. Try again..."
+    
+        });
+    }
