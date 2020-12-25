@@ -1,15 +1,22 @@
 const connection = require("./connection");
+var mysql = require("mysql");
 
 module.exports = {
-    viewDepartments() {
+    getDepartments() {
         return connection.query( "SELECT * FROM department");
-    }
+    },
 
-    viewRoles() {
-        return connection.query( "SELECT * FROM emp_role");
-    }
+    getRoles() {
+        return connection.query( "SELECT * FROM role");
+    },
 
-    viewEmployees() {
+    getEmployees() {
         return connection.query( "SELECT * FROM employee");
+    },
+
+    insertRole(data) {
+        return connection.query("INSERT INTO role SET ?", data)
     }
+
+
 }
