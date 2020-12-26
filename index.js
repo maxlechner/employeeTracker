@@ -19,6 +19,7 @@ function actionPrompt() {
             "VIEW_EMPLOYEES", 
             "CREATE_ROLE",
             "CREATE_DEPARTMENT",
+            "CREATE_EMPLOYEE",
             "QUIT" ]
     })
     .then(( res ) => {;
@@ -42,6 +43,10 @@ function actionPrompt() {
 
             case "CREATE_DEPARTMENT":
                 createDepartment();
+                return;
+        
+            case "CREATE_EMPLOYEE":
+                createEmployee();
                 return;
             
             default: 
@@ -145,4 +150,50 @@ function createDepartment() {
         })
 }
 
-    
+function createEmployee() {
+    db
+        .getRoles( )
+        .then(( role ) => {
+
+            // console.table( department )
+
+            inquirer
+                .prompt([
+                    {
+                        message: "What is the title of this employees role?",
+                        type: "list",
+                        name: "role_id",
+                        choices: role.map( (role) =>({
+                            value: role.id,
+                            name: role.title
+                        }))
+                    },
+                    {
+                        message: "What is the employees first name?",
+                        type: "input",
+                        name: "first_name",
+                    },
+                    {
+                        message: "What is the employees last name?",
+                        type: "input",
+                        name: "last_name",
+                    },
+                    {
+                        message: "What is the manager's id number?",
+                        type: "input",
+                        name: "manager_id",
+                    }
+                ]).then(( response ) => {
+                    // console.log( response );
+                    var newEmployee = {
+                        first_name: response.first_name,
+                        last_name: response.last_name,
+                        role_id: Number(response.role_id),
+                        manager_id: Number(response.manager_id)
+
+                    }
+                    db.insertEmployee( newEmployee );
+                    viewEmployees();
+                })
+        })
+}
