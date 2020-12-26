@@ -15,7 +15,6 @@ module.exports = {
     },
 
     getDepts_Roles() {
-        // return connection.query( "SELECT * FROM employee");
         return connection.query(
             "SELECT role.title, role.id, role.dept_id, department.id, department.dept_name FROM department INNER JOIN role ON role.dept_id=department.id");
     },

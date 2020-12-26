@@ -208,8 +208,6 @@ function updateRole() {
         .getDepts_Roles( )
         .then(( role ) => {
 
-            console.table( role )
-
             inquirer
                 .prompt([
                     {
@@ -242,7 +240,6 @@ function updateRole() {
                     }
 
                 ]).then(( response ) => {
-                    // console.log( response );
                     var updatedRole = {
                         title: response.role_title,
                         salary: Number(response.employee_salary),
