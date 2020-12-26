@@ -20,6 +20,7 @@ function actionPrompt() {
             "CREATE_ROLE",
             "CREATE_DEPARTMENT",
             "CREATE_EMPLOYEE",
+            "UPDATE_ROLE",
             "QUIT" ]
     })
     .then(( res ) => {;
@@ -47,6 +48,10 @@ function actionPrompt() {
         
             case "CREATE_EMPLOYEE":
                 createEmployee();
+                return;
+
+            case "UPDATE_ROLE":
+                updateRole();
                 return;
             
             default: 
@@ -194,6 +199,58 @@ function createEmployee() {
                     }
                     db.insertEmployee( newEmployee );
                     viewEmployees();
+                })
+        })
+}
+
+function updateRole() {
+    db
+        .getDepts_Roles( )
+        .then(( role ) => {
+
+            console.table( role )
+
+            inquirer
+                .prompt([
+                    {
+                        message: "Which role would you like to update?",
+                        type: "list",
+                        name: "role_id",
+                        choices: role.map( (role) =>({
+                            value: role.id,
+                            name: role.title
+                        }))
+                    },
+                    {
+                        message: "What is the update title for this role?",
+                        type: "input",
+                        name: "role_title",
+                    },
+                    {
+                        message: "What is the updated salary?",
+                        type: "input",
+                        name: "employee_salary",
+                    },
+                    {
+                        message: "What department should this role be in?",
+                        type: "list",
+                        name: "department_id",
+                        choices: role.map( (role) =>({
+                            value:role.id,
+                            name: role.dept_name
+                        }))
+                    }
+
+                ]).then(( response ) => {
+                    // console.log( response );
+                    var updatedRole = {
+                        title: response.role_title,
+                        salary: Number(response.employee_salary),
+                        dept_id: Number(response.department_id)
+                    }
+                    var role_id = response.role_id;
+                    db.insertRole( updatedRole, role_id );
+                    viewRoles();
                 })
         })
 }
