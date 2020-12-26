@@ -2,7 +2,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 const db = require("./db");
-const { viewRoles, viewEmployees, insertRole } = require("./db");
+// const { viewRoles, viewEmployees, insertRole } = require("./db");
 const connection = require("./db/connection")
 // const { createPromptModule } = require("inquirer");
 
@@ -12,12 +12,13 @@ function actionPrompt() {
     inquirer.prompt({
         name: "action",
         type:"list",
-        message: "would you like view [add] a data element, [view] a data element, or [update] employee roles?",
+        message: "would you like view [create] a data element, [view] a data element, or [update] employee roles?",
         choices: [ 
             "VIEW_DEPARTMENTS", 
             "VIEW_ROLES", 
             "VIEW_EMPLOYEES", 
             "CREATE_ROLE",
+            "CREATE_DEPARTMENT",
             "QUIT" ]
     })
     .then(( res ) => {;
@@ -28,15 +29,19 @@ function actionPrompt() {
                 return;
 
             case "VIEW_ROLES":
-                seeRoles();
+                viewRoles();
                 return;
 
             case "VIEW_EMPLOYEES":
-                seeEmployees();
+                viewEmployees();
                 return;
 
             case "CREATE_ROLE":
                 createRole();
+                return;
+
+            case "CREATE_DEPARTMENT":
+                createDepartment();
                 return;
             
             default: 
@@ -59,7 +64,7 @@ function viewDepartments() {
 
 }
 
-function seeRoles() {
+function viewRoles() {
     db
         .getRoles()
 
@@ -70,7 +75,7 @@ function seeRoles() {
 
 }
 
-function seeEmployees() {
+function viewEmployees() {
     db
         .getEmployees()
 
@@ -86,7 +91,7 @@ function createRole() {
         .getDepartments( )
         .then(( department ) => {
 
-            console.table( department )
+            // console.table( department )
 
             inquirer
                 .prompt([
@@ -110,15 +115,33 @@ function createRole() {
                         name: "employee_salary",
                     }
                 ]).then(( response ) => {
-                    console.log( response );
+                    // console.log( response );
                     var newRole = {
                         title: response.employee_role,
                         salary: Number(response.employee_salary),
                         dept_id: Number(response.department_id)
                     }
                     db.insertRole( newRole );
-                    actionPrompt();
+                    viewRoles();
                 })
+        })
+}
+
+function createDepartment() {
+    inquirer
+        .prompt([
+            {
+                message: "What department would you like to add?",
+                type: "input",
+                name: "department",
+            }
+        ]).then(( response ) => {
+            // console.log( response );
+            var newDept = {
+                dept_name: response.department,
+            }
+            db.insertDepartment( newDept );
+            viewDepartments();
         })
 }
 
