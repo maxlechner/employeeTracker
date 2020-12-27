@@ -7,7 +7,7 @@ module.exports = {
     },
 
     getRoles() {
-        return connection.query( "SELECT * FROM role");
+        return connection.query( "SELECT * FROM role" );
     },
 
     getEmployees() {
@@ -17,6 +17,11 @@ module.exports = {
     getDepts_Roles() {
         return connection.query(
             "SELECT role.title, role.id, role.dept_id, department.id, department.dept_name FROM department INNER JOIN role ON role.dept_id=department.id");
+    },
+
+    getEmployees_Roles() {
+        return connection.query(
+            "SELECT role.id, role.title, employee.role_id, employee.id, employee.first_name, employee.last_name, employee.manager_id, employee.first_name, employee.last_name FROM employee INNER JOIN role ON role.id=employee.role_id");
     },
 
     insertRole(data) {
@@ -32,7 +37,7 @@ module.exports = {
     }, 
 
     updateRole(data) {
-        return connection.query("UPDATE role SET ? WHERE ?")
+        return connection.query("UPDATE employee SET ? WHERE ?", data)
     }
 
 }
