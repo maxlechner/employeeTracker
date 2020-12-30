@@ -22,6 +22,7 @@ function actionPrompt() {
             "CREATE_EMPLOYEE",
             "UPDATE_ROLE",
             "UPDATE_MANAGER",
+            "VIEW_BY_MANAGER",
             "QUIT" ]
     })
     .then(( res ) => {;
@@ -57,6 +58,10 @@ function actionPrompt() {
             
             case "UPDATE_MANAGER":
                 updateManager();
+                return;
+
+            case "VIEW_BY_MANAGER":
+                viewByManager();
                 return;
 
             default: 
@@ -268,7 +273,7 @@ function updateManager() {
             inquirer
                 .prompt([
                     {
-                        message: "What is the name of the employee whose role you would like to update",
+                        message: "What is the name of the employee whose manager you would like to update",
                         type: "list",
                         name: "employee_id",
                         choices: mgr_emp.map( ( mgr_emp ) =>({
@@ -304,53 +309,39 @@ function updateManager() {
         })
 }
 
-// function updateRole() {
-//     db
-//         .getDepts_Roles( )
-//         .then(( role ) => {
+function viewByManager() {
+    db
+        .getEmployees( )
+        .then(( mgr_emp ) => {
 
-//             console.table( role )
+            // console.table( mgr_emp );
 
-//             inquirer
-//                 .prompt([
-//                     {
-//                         message: "Which role would you like to update?",
-//                         type: "list",
-//                         name: "role_id",
-//                         choices: role.map( (role) =>({
-//                             value: role.id,
-//                             name: role.title
-//                         }))
-//                     },
-//                     {
-//                         message: "What is the updated title for this role?",
-//                         type: "input",
-//                         name: "role_title",
-//                     },
-//                     {
-//                         message: "What is the updated salary?",
-//                         type: "input",
-//                         name: "employee_salary",
-//                     },
-//                     {
-//                         message: "What department should this role be in?",
-//                         type: "list",
-//                         name: "department_id",
-//                         choices: role.map( (role) =>({
-//                             value:role.id,
-//                             name: role.dept_name
-//                         }))
-//                     }
+            inquirer
+                .prompt([
+                    {
+                        message: "What is the name of the manager whose employees you would like to view",
+                        type: "list",
+                        name: "manager_id",
+                        choices: mgr_emp.map( ( mgr_emp ) =>({
+                            value: mgr_emp.id,
+                            name: mgr_emp.first_name + " " + mgr_emp.last_name
+                        }))
+                    }
 
-//                 ]).then(( response ) => {
-//                     var updatedRole = {
-//                         title: response.role_title,
-//                         salary: Number(response.employee_salary),
-//                         dept_id: Number(response.department_id)
-//                     }
-//                     var role_id = response.role_id;
-//                     db.updateRole( updatedRole, role_id );
-//                     viewRoles();
-//                 })
-//         })
-// }
+                ]).then(( response ) => {
+                    var managerId = 
+                    [
+                        {
+                            manager_id: response.manager_id
+                        }
+                    ]
+                    // console.log( managerId );
+                    db.managerGroup( managerId )
+                    .then((results) => {
+                        console.table( results );
+                        actionPrompt(); 
+                    });
+                    // viewEmployees();
+                })
+        })
+}

@@ -42,6 +42,15 @@ module.exports = {
 
     updateManager(data) {
         return connection.query("UPDATE employee SET ? WHERE ?", data)
+    },
+
+    managerGroup(data) {
+        return connection.query("SELECT * FROM employee WHERE ?", data)
+    },
+
+    deleteRow(data) {
+        return connection.query("DELETE FROM ? WHERE ?", data)
     }
+    
 
 }
