@@ -38,6 +38,10 @@ module.exports = {
 
     updateRole(data) {
         return connection.query("UPDATE employee SET ? WHERE ?", data)
+    },
+
+    updateManager(data) {
+        return connection.query("UPDATE employee SET ? WHERE ?", data)
     }
 
 }

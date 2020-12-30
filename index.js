@@ -21,6 +21,7 @@ function actionPrompt() {
             "CREATE_DEPARTMENT",
             "CREATE_EMPLOYEE",
             "UPDATE_ROLE",
+            "UPDATE_MANAGER",
             "QUIT" ]
     })
     .then(( res ) => {;
@@ -54,6 +55,10 @@ function actionPrompt() {
                 updateRole();
                 return;
             
+            case "UPDATE_MANAGER":
+                updateManager();
+                return;
+
             default: 
                 connection.end()
 
@@ -184,12 +189,12 @@ function createEmployee() {
                         name: "last_name",
                     },
                     {
-                        message: "What is the manager's Last Name?",
+                        message: "What is the manager's name?",
                         type: "list",
                         name: "manager_id",
                         choices: role_emp.map( ( role_emp ) =>({
                             value: role_emp.id,
-                            name: role_emp.last_name
+                            name: role_emp.first_name + " " + role_emp.last_name
                         }))
                     }
                 ]).then(( response ) => {
@@ -222,7 +227,7 @@ function updateRole() {
                         name: "employee_id",
                         choices: role_emp.map( ( role_emp ) =>({
                             value: role_emp.id,
-                            name: role_emp.last_name
+                            name: role_emp.first_name + " " + role_emp.last_name
                         }))
                     },
                     {
@@ -230,7 +235,7 @@ function updateRole() {
                         type: "list",
                         name: "role_id",
                         choices: role_emp.map( ( role_emp ) =>({
-                            value:role_emp.role_id,
+                            value: role_emp.role_id,
                             name: role_emp.title
                         }))
                     }
@@ -248,6 +253,52 @@ function updateRole() {
                     ]
                     console.log( updatedRole );
                     db.updateRole( updatedRole );
+                    viewEmployees();
+                })
+        })
+}
+
+function updateManager() {
+    db
+        .getEmployees( )
+        .then(( mgr_emp ) => {
+
+            console.table( mgr_emp );
+
+            inquirer
+                .prompt([
+                    {
+                        message: "What is the name of the employee whose role you would like to update",
+                        type: "list",
+                        name: "employee_id",
+                        choices: mgr_emp.map( ( mgr_emp ) =>({
+                            value: mgr_emp.id,
+                            name: mgr_emp.first_name + " " + mgr_emp.last_name
+                        }))
+                    },
+                    {
+                        message: "Who would you like to make their manager?",
+                        type: "list",
+                        name: "manager_id",
+                        choices: mgr_emp.map( ( mgr_emp ) =>({
+                            value: mgr_emp.id,
+                            name: mgr_emp.first_name + " " + mgr_emp.last_name
+                        }))
+                    }
+
+                ]).then(( response ) => {
+                    var updatedManager = 
+                    [
+                        {
+                            manager_id: response.manager_id
+                        },
+                        {
+                            id: response.employee_id
+                        }
+                        
+                    ]
+                    console.log( updatedManager );
+                    db.updateManager( updatedManager );
                     viewEmployees();
                 })
         })
