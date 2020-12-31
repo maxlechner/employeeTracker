@@ -22,7 +22,9 @@ function actionPrompt() {
             "CREATE_EMPLOYEE",
             "UPDATE_ROLE",
             "UPDATE_MANAGER",
+            "DELETE_DEPARTMENT",
             "VIEW_BY_MANAGER",
+            "VIEW_BUDGET",
             "QUIT" ]
     })
     .then(( res ) => {;
@@ -60,8 +62,16 @@ function actionPrompt() {
                 updateManager();
                 return;
 
+            case "DELETE_DEPARTMENT":
+                deleteDepartment();
+                return;
+
             case "VIEW_BY_MANAGER":
                 viewByManager();
+                return;
+
+            case "VIEW_BUDGET":
+                viewBudget();
                 return;
 
             default: 
@@ -345,3 +355,63 @@ function viewByManager() {
                 })
         })
 }
+
+function deleteDepartment() {
+    db
+        .getDepartments( )
+        .then(( department ) => {
+
+            // console.table( department )
+
+            inquirer
+                .prompt([
+                    {
+                        message: "Which department would you like to remove?",
+                        type: "list",
+                        name: "department_id",
+                        choices: department.map( (department) =>({
+                            value: department.id,
+                            name: department.dept_name
+                        }))
+                    },
+                ]).then(( response ) => {
+                    // console.log( response );
+                    var remDep = {
+                        id: Number(response.department_id)
+                    }
+                    db.removeDepartment( remDep );
+                    viewDepartments();
+                })
+        })
+}
+
+function viewBudget() {
+    db
+        .getDepartments( )
+        .then(( department ) => {
+
+            // console.table( department )
+
+            inquirer
+                .prompt([
+                    {
+                        message: "Which department would you like to remove?",
+                        type: "list",
+                        name: "department_id",
+                        choices: department.map( (department) =>({
+                            value: department.id,
+                            name: department.dept_name
+                        }))
+                    },
+                ]).then(( response ) => {
+                    // console.log( response );
+                    var remDep = {
+                        id: Number(response.department_id)
+                    }
+                    db.removeDepartment( remDep );
+                    viewDepartments();
+                })
+        })
+}
+
+

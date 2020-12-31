@@ -48,8 +48,8 @@ module.exports = {
         return connection.query("SELECT * FROM employee WHERE ?", data)
     },
 
-    deleteRow(data) {
-        return connection.query("DELETE FROM ? WHERE ?", data)
+    removeDepartment(data) {
+        return connection.query("DELETE FROM department WHERE ?", data)
     }
     
 
