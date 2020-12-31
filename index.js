@@ -395,7 +395,7 @@ function viewBudget() {
             inquirer
                 .prompt([
                     {
-                        message: "Which department would you like to remove?",
+                        message: "Which department would you like to view the budget of?",
                         type: "list",
                         name: "department_id",
                         choices: department.map( (department) =>({
@@ -405,11 +405,14 @@ function viewBudget() {
                     },
                 ]).then(( response ) => {
                     // console.log( response );
-                    var remDep = {
-                        id: Number(response.department_id)
+                    var deptBudget = {
+                        dept_id: Number(response.department_id)
                     }
-                    db.removeDepartment( remDep );
-                    viewDepartments();
+                    db.getBudget( deptBudget )
+                    .then((results) => {
+                        console.table( results );
+                        actionPrompt(); 
+                    });
                 })
         })
 }

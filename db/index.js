@@ -50,6 +50,10 @@ module.exports = {
 
     removeDepartment(data) {
         return connection.query("DELETE FROM department WHERE ?", data)
+    },
+
+    getBudget(data) {
+        return connection.query("SELECT role.dept_id, role.id AS roleID, role.salary,employee.role_id, SUM(role.salary) FROM employee JOIN role ON role.id = employee.role_id JOIN department ON department.id = role.dept_id WHERE ? GROUP BY role.dept_id", data)
     }
     
 
