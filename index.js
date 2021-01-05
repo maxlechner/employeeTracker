@@ -24,6 +24,7 @@ function actionPrompt() {
             "UPDATE_MANAGER",
             "DELETE_DEPARTMENT",
             "DELETE_ROLE",
+            "DELETE_EMPLOYEE",
             "VIEW_BY_MANAGER",
             "VIEW_BUDGET",
             "QUIT" ]
@@ -69,6 +70,10 @@ function actionPrompt() {
 
             case "DELETE_ROLE":
                 deleteRole();
+                return;
+
+            case "DELETE_EMPLOYEE":
+                deleteEmployee();
                 return;
 
             case "VIEW_BY_MANAGER":
@@ -395,7 +400,7 @@ function deleteRole() {
         .getRoles( )
         .then(( roles ) => {
 
-            // console.table( department )
+            // console.table( roles )
 
             inquirer
                 .prompt([
@@ -415,6 +420,35 @@ function deleteRole() {
                     }
                     db.removeRole( remRole );
                     viewRoles();
+                })
+        })
+}
+
+function deleteEmployee() {
+    db
+        .getEmployees( )
+        .then(( employees ) => {
+
+            // console.table( employees )
+
+            inquirer
+                .prompt([
+                    {
+                        message: "Which employee would you like to remove?",
+                        type: "list",
+                        name: "employee_id",
+                        choices: employees.map( (employees) =>({
+                            value: employees.id,
+                            name: employees.first_name + " " + employees.last_name
+                        }))
+                    },
+                ]).then(( response ) => {
+                    // console.log( response );
+                    var remEmp = {
+                        id: Number(response.employee_id)
+                    }
+                    db.removeEmployee( remEmp );
+                    viewEmployees();
                 })
         })
 }
