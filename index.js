@@ -23,6 +23,7 @@ function actionPrompt() {
             "UPDATE_ROLE",
             "UPDATE_MANAGER",
             "DELETE_DEPARTMENT",
+            "DELETE_ROLE",
             "VIEW_BY_MANAGER",
             "VIEW_BUDGET",
             "QUIT" ]
@@ -64,6 +65,10 @@ function actionPrompt() {
 
             case "DELETE_DEPARTMENT":
                 deleteDepartment();
+                return;
+
+            case "DELETE_ROLE":
+                deleteRole();
                 return;
 
             case "VIEW_BY_MANAGER":
@@ -381,6 +386,35 @@ function deleteDepartment() {
                     }
                     db.removeDepartment( remDep );
                     viewDepartments();
+                })
+        })
+}
+
+function deleteRole() {
+    db
+        .getRoles( )
+        .then(( roles ) => {
+
+            // console.table( department )
+
+            inquirer
+                .prompt([
+                    {
+                        message: "Which role would you like to remove?",
+                        type: "list",
+                        name: "role_id",
+                        choices: roles.map( (roles) =>({
+                            value: roles.id,
+                            name: roles.title
+                        }))
+                    },
+                ]).then(( response ) => {
+                    // console.log( response );
+                    var remRole = {
+                        id: Number(response.role_id)
+                    }
+                    db.removeRole( remRole );
+                    viewRoles();
                 })
         })
 }
